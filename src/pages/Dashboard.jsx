@@ -1,22 +1,36 @@
 // src/pages/Dashboard.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase"; // Adjust path if needed
+import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import CarSelector from "../components/CarSelector";
 import BatteryInput from "../components/BatteryInput";
 import SmartSuggestion from "../components/SmartSuggestion";
 import MapView from "../components/MapView";
+import Filters from "../components/Filters";
+import { fetchStations } from "../utils/openChargeMapAPI";
+import { estimateChargingTime } from "../utils/chargingUtils";
+import { useCurrentLocation } from "../utils/locationUtils";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selectedCar, setSelectedCar] = useState(null);
   const [batteryPercentage, setBatteryPercentage] = useState(50);
+  const [stations, setStations] = useState([]);
+  const [filters, setFilters] = useState({ connector: "", available: "" });
+
+  const location = useCurrentLocation();
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (location) {
+      fetchStations(location.lat, location.lng, filters).then(setStations);
+    }
+  }, [location, filters]);
 
   return (
     <div className="container py-4">
@@ -26,17 +40,27 @@ export default function Dashboard() {
       </div>
 
       <div className="row mb-4">
-        <div className="col-md-6">
+        <div className="col-md-4">
           <CarSelector selectedCar={selectedCar} setSelectedCar={setSelectedCar} />
         </div>
-        <div className="col-md-6">
+        <div className="col-md-4">
           <BatteryInput batteryPercentage={batteryPercentage} setBatteryPercentage={setBatteryPercentage} />
+        </div>
+        <div className="col-md-4">
+          <Filters filters={filters} setFilters={setFilters} />
         </div>
       </div>
 
-      <SmartSuggestion selectedCar={selectedCar} batteryPercentage={batteryPercentage} />
-
-      <MapView selectedCar={selectedCar} batteryPercentage={batteryPercentage} />
+      <div className="row">
+        <div className="col-12">
+          <MapView 
+            stations={stations} 
+            userLocation={location} 
+            batterySize={selectedCar?.batterySize || 40} 
+            batteryPercentage={batteryPercentage} 
+          />
+        </div>
+      </div>
     </div>
   );
-}  
+}
