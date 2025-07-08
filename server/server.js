@@ -1,24 +1,24 @@
 // server/server.js
 import express from "express";
-import fetch from "node-fetch";
 import cors from "cors";
+import fetch from "node-fetch";
 
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 
-app.get("/proxy", async (req, res) => {
-  const { target } = req.query;
-  if (!target) return res.status(400).send("Missing target URL");
+app.get("/api/openchargemap", async (req, res) => {
+  const { latitude, longitude, distance, maxresults } = req.query;
+
+  const apiUrl = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=IN&latitude=${latitude}&longitude=${longitude}&distance=${distance}&maxresults=${maxresults}&key=18ec7b67-9e4e-457f-8bab-11a22eebcc1a`;
 
   try {
-    const decodedUrl = decodeURIComponent(target);
-    const response = await fetch(decodedUrl);
-    const data = await response.json(); // Fails if response is HTML
+    const response = await fetch(apiUrl);
+    const data = await response.json();
     res.json(data);
-  } catch (error) {
-    console.error("Proxy error:", error.message);
+  } catch (err) {
+    console.error("❌ Error fetching OpenChargeMap data:", err);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });

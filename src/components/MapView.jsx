@@ -1,15 +1,42 @@
-// src/components/MapView.jsx
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+// ✅ src/components/MapView.jsx
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
 import { estimateChargingTime } from "../utils/chargingUtils";
 
-// Fix Leaflet marker icons (important!)
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+// 📌 Fix default Leaflet marker icons
+import greenIconUrl from "../assets/marker-green.png";
+import redIconUrl from "../assets/marker-red.png";
+
+const greenIcon = new L.Icon({
+  iconUrl: greenIconUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
 });
+
+const redIcon = new L.Icon({
+  iconUrl: redIconUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+function FlyToLocation({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, 13);
+    }
+  }, [position, map]);
+  return null;
+}
 
 export default function MapView({
   stations = [],
@@ -17,50 +44,77 @@ export default function MapView({
   batterySize = 0,
   batteryPercentage = 0,
 }) {
-  if (!userLocation) return <p>Loading map...</p>;
+  const [routePath, setRoutePath] = useState(null);
 
-  const center = [userLocation.lat, userLocation.lng];
+  const center = userLocation
+    ? [userLocation.lat, userLocation.lng]
+    : [15.85, 74.5];
+
+  const handleRoute = (station) => {
+    const dest = [
+      station.AddressInfo.Latitude,
+      station.AddressInfo.Longitude,
+    ];
+    setRoutePath([center, dest]);
+  };
 
   return (
     <MapContainer center={center} zoom={13} style={{ height: "60vh", width: "100%" }}>
+      <FlyToLocation position={center} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+        attribution="&copy; OpenStreetMap contributors"
       />
 
-      {/* User location marker */}
-      <Marker position={center}>
-        <Popup>Your current location</Popup>
-      </Marker>
+      {/* User marker */}
+      {userLocation && (
+        <Marker position={center}>
+          <Popup>📍 You are here</Popup>
+        </Marker>
+      )}
 
-      {/* Charging stations */}
+      {/* Station markers */}
       {stations.map((station, index) => {
         const pos = [
           station.AddressInfo.Latitude,
           station.AddressInfo.Longitude,
         ];
+        const isOperational = station.StatusType?.IsOperational;
+        const numChargers = station.Connections?.length || 0;
+        const icon = isOperational ? greenIcon : redIcon;
 
-        const distanceKm = station.AddressInfo.Distance || 0;
         const estimatedTime = estimateChargingTime(
           batterySize,
           batteryPercentage,
-          distanceKm
+          station.AddressInfo.Distance || 0
         );
 
         return (
-          <Marker key={index} position={pos}>
+          <Marker key={index} position={pos} icon={icon}>
             <Popup>
               <strong>{station.AddressInfo.Title}</strong>
               <br />
-              Distance: {distanceKm.toFixed(1)} km
+              {station.AddressInfo.AddressLine1}
               <br />
-              Est. Charge Time: {estimatedTime} mins
+              🔌 Connectors: {numChargers}
               <br />
-              Connectors: {station.Connections?.length || 0}
+              ⚡ Status: {isOperational ? "Available" : "Offline"}
+              <br />
+              ⏱ Charge Time: {estimatedTime} mins
+              <br />
+              <button
+                className="btn btn-sm btn-primary mt-1"
+                onClick={() => handleRoute(station)}
+              >
+                📍 Route to Here
+              </button>
             </Popup>
           </Marker>
         );
       })}
+
+      {/* Route line */}
+      {routePath && <Polyline positions={routePath} color="blue" />}
     </MapContainer>
   );
 }

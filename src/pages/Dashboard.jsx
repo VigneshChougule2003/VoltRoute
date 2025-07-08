@@ -27,10 +27,18 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (location) {
+    if (location?.lat && location?.lng) {
       fetchStations(location.lat, location.lng, filters).then(setStations);
     }
   }, [location, filters]);
+
+  if (!location) {
+    return (
+      <div className="container py-4">
+        <h4>📍 Locating your position...</h4>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-4">
