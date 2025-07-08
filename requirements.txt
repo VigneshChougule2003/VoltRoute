@@ -2,3 +2,4 @@ react-leaflet@^4.2.1
 bootstrap
 react-router-dom
 firebase
+lottie-react 
