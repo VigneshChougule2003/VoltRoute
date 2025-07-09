@@ -18,7 +18,6 @@ export default function Dashboard() {
   const [batteryPercentage, setBatteryPercentage] = useState(50);
   const [stations, setStations] = useState([]);
   const [filters, setFilters] = useState({ connector: "", available: "" });
-  const [selectedStation, setSelectedStation] = useState(null);
 
   const location = useCurrentLocation();
 
@@ -27,10 +26,19 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  useEffect(() => {
+  const fetchStationData = () => {
     if (location?.lat && location?.lng) {
       fetchStations(location.lat, location.lng, filters).then(setStations);
     }
+  };
+
+  useEffect(() => {
+    fetchStationData();
+  }, [location, filters]);
+
+  useEffect(() => {
+    const interval = setInterval(fetchStationData, 60000); // Auto-refresh every 60 seconds
+    return () => clearInterval(interval);
   }, [location, filters]);
 
   if (!location) {
@@ -60,7 +68,11 @@ export default function Dashboard() {
             <BatteryInput batteryPercentage={batteryPercentage} setBatteryPercentage={setBatteryPercentage} />
           </div>
           <div className="dashboard-card">
-            <Filters filters={filters} setFilters={setFilters} />
+            <Filters
+              filters={filters}
+              setFilters={setFilters}
+              onRefresh={fetchStationData}
+            />
           </div>
         </div>
 
@@ -70,8 +82,6 @@ export default function Dashboard() {
             userLocation={location}
             batterySize={selectedCar?.batterySize || 40}
             batteryPercentage={batteryPercentage}
-            selectedStation={selectedStation}
-            setSelectedStation={setSelectedStation}
           />
         </div>
       </div>

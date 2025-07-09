@@ -10,9 +10,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
-import { estimateChargingTime } from "../utils/chargingUtils";
-
-// 📌 Fix default Leaflet marker icons
+import { estimateChargingTime, estimateChargingCost } from "../utils/chargingUtils";
 import greenIconUrl from "../assets/marker-green.png";
 import redIconUrl from "../assets/marker-red.png";
 
@@ -21,7 +19,6 @@ const greenIcon = new L.Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
-
 const redIcon = new L.Icon({
   iconUrl: redIconUrl,
   iconSize: [25, 41],
@@ -31,9 +28,7 @@ const redIcon = new L.Icon({
 function FlyToLocation({ position }) {
   const map = useMap();
   useEffect(() => {
-    if (position) {
-      map.flyTo(position, 13);
-    }
+    if (position) map.flyTo(position, 13);
   }, [position, map]);
   return null;
 }
@@ -46,23 +41,17 @@ export default function MapView({
 }) {
   const [routePath, setRoutePath] = useState(null);
 
-  const center = userLocation
-    ? [userLocation.lat, userLocation.lng]
-    : [15.85, 74.5];
+  const center = userLocation ? [userLocation.lat, userLocation.lng] : [15.85, 74.5];
 
   const handleRoute = (station) => {
-    const dest = [
-      station.AddressInfo.Latitude,
-      station.AddressInfo.Longitude,
-    ];
+    const dest = [station.AddressInfo.Latitude, station.AddressInfo.Longitude];
     setRoutePath([center, dest]);
   };
 
   const openInGoogleMaps = (station) => {
     const origin = `${userLocation.lat},${userLocation.lng}`;
     const dest = `${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}`;
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`;
-    window.open(url, "_blank");
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`, "_blank");
   };
 
   return (
@@ -74,20 +63,14 @@ export default function MapView({
       />
 
       {/* User marker */}
-      {userLocation && (
-        <Marker position={center}>
-          <Popup>📍 You are here</Popup>
-        </Marker>
-      )}
+      <Marker position={center}>
+        <Popup>📍 You are here</Popup>
+      </Marker>
 
-      {/* Station markers */}
+      {/* Charging station markers */}
       {stations.map((station, index) => {
-        const pos = [
-          station.AddressInfo.Latitude,
-          station.AddressInfo.Longitude,
-        ];
+        const pos = [station.AddressInfo.Latitude, station.AddressInfo.Longitude];
         const isOperational = station.StatusType?.IsOperational;
-        const numChargers = station.Connections?.length || 0;
         const icon = isOperational ? greenIcon : redIcon;
 
         const estimatedTime = estimateChargingTime(
@@ -96,37 +79,26 @@ export default function MapView({
           station.AddressInfo.Distance || 0
         );
 
+        const powerKW = station.Connections?.[0]?.PowerKW || 22;
+        const estimatedCost = estimateChargingCost(batterySize, batteryPercentage, powerKW);
+
         return (
           <Marker key={index} position={pos} icon={icon}>
             <Popup>
-              <strong>{station.AddressInfo.Title}</strong>
-              <br />
-              {station.AddressInfo.AddressLine1}
-              <br />
-              🔌 Connectors: {numChargers}
-              <br />
-              ⚡ Status: {isOperational ? "Available" : "Offline"}
-              <br />
-              ⏱ Charge Time: {estimatedTime} mins
-              <br />
-              <button
-                className="btn btn-sm btn-primary mt-1"
-                onClick={() => handleRoute(station)}
-              >
-                📍 Show Route
-              </button>
-              <button
-                className="btn btn-sm btn-success mt-1 ms-2"
-                onClick={() => openInGoogleMaps(station)}
-              >
-                🧭 Open in Google Maps
-              </button>
+              <strong>{station.AddressInfo.Title}</strong><br />
+              {station.AddressInfo.AddressLine1}<br />
+              ⚡ Power: {powerKW} kW<br />
+              🔌 Connectors: {station.Connections?.length || 0}<br />
+              💡 Status: {isOperational ? "🟢 Available" : "🔴 Unavailable"}<br />
+              ⏱ Time to full charge: {estimatedTime} mins<br />
+              💰 Estimated cost: ₹{estimatedCost}<br />
+              <button className="btn btn-sm btn-primary mt-1" onClick={() => handleRoute(station)}>📍 Show Route</button>
+              <button className="btn btn-sm btn-success mt-1 ms-2" onClick={() => openInGoogleMaps(station)}>🧭 Open in Google Maps</button>
             </Popup>
           </Marker>
         );
       })}
 
-      {/* Route line */}
       {routePath && <Polyline positions={routePath} color="blue" />}
     </MapContainer>
   );

@@ -1,13 +1,18 @@
-// src/utils/chargingUtils.js
+// ✅ src/utils/chargingUtils.js
 
 /**
- * Estimate time to full charge in hours.
- * @param {number} batterySize - in kWh
- * @param {number} batteryPercentage - from 0 to 100
- * @param {number} chargerPower - in kW (default 7kW if not provided)
+ * Estimate charging time based on battery size and percentage remaining.
  */
-export function estimateChargingTime(batterySize, batteryPercentage, chargerPower = 7) {
-  const remainingCapacity = batterySize * ((100 - batteryPercentage) / 100);
-  const time = remainingCapacity / chargerPower;
-  return time.toFixed(2);
+export function estimateChargingTime(batterySizeKWh, batteryPercentage, chargerPowerKW) {
+  const chargeNeeded = batterySizeKWh * (1 - batteryPercentage / 100);
+  const timeHours = chargeNeeded / chargerPowerKW;
+  return Math.round(timeHours * 60);
+}
+
+/**
+ * Estimate cost based on power and battery size (assumes ₹12/kWh).
+ */
+export function estimateChargingCost(batterySizeKWh, batteryPercentage, chargerPowerKW, rate = 24) {
+  const energyToCharge = batterySizeKWh * (1 - batteryPercentage / 100);
+  return Math.round(energyToCharge * rate);
 }
