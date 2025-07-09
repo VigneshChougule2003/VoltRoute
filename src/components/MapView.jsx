@@ -58,6 +58,13 @@ export default function MapView({
     setRoutePath([center, dest]);
   };
 
+  const openInGoogleMaps = (station) => {
+    const origin = `${userLocation.lat},${userLocation.lng}`;
+    const dest = `${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}`;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <MapContainer center={center} zoom={13} style={{ height: "60vh", width: "100%" }}>
       <FlyToLocation position={center} />
@@ -106,7 +113,13 @@ export default function MapView({
                 className="btn btn-sm btn-primary mt-1"
                 onClick={() => handleRoute(station)}
               >
-                📍 Route to Here
+                📍 Show Route
+              </button>
+              <button
+                className="btn btn-sm btn-success mt-1 ms-2"
+                onClick={() => openInGoogleMaps(station)}
+              >
+                🧭 Open in Google Maps
               </button>
             </Popup>
           </Marker>

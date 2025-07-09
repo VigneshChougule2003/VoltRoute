@@ -1,3 +1,4 @@
+// src/pages/Dashboard.jsx
 import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
@@ -9,7 +10,7 @@ import MapView from "../components/MapView";
 import Filters from "../components/Filters";
 import { fetchStations } from "../utils/openChargeMapAPI";
 import { useCurrentLocation } from "../utils/locationUtils";
-import "./Dashboard.css"; // ✅ Import new CSS
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [batteryPercentage, setBatteryPercentage] = useState(50);
   const [stations, setStations] = useState([]);
   const [filters, setFilters] = useState({ connector: "", available: "" });
+  const [selectedStation, setSelectedStation] = useState(null);
 
   const location = useCurrentLocation();
 
@@ -68,6 +70,8 @@ export default function Dashboard() {
             userLocation={location}
             batterySize={selectedCar?.batterySize || 40}
             batteryPercentage={batteryPercentage}
+            selectedStation={selectedStation}
+            setSelectedStation={setSelectedStation}
           />
         </div>
       </div>
