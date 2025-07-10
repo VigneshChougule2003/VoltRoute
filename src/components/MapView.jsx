@@ -1,4 +1,4 @@
-// ✅ src/components/MapView.jsx
+// src/components/MapView.jsx
 import {
   MapContainer,
   TileLayer,
@@ -10,7 +10,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
-import { estimateChargingTime, estimateChargingCost } from "../utils/chargingUtils";
+import { estimateChargingTime, estimateChargingCost, getEstimatedPowerFromLevel } from "../utils/chargingUtils";
 import greenIconUrl from "../assets/marker-green.png";
 import redIconUrl from "../assets/marker-red.png";
 
@@ -39,13 +39,13 @@ export default function MapView({
   batterySize = 0,
   batteryPercentage = 0,
 }) {
-  const [routePath, setRoutePath] = useState(null);
+  const [routePath, setRoutePath] = useState([]);
 
   const center = userLocation ? [userLocation.lat, userLocation.lng] : [15.85, 74.5];
 
-  const handleRoute = (station) => {
+  const handleAddStop = (station) => {
     const dest = [station.AddressInfo.Latitude, station.AddressInfo.Longitude];
-    setRoutePath([center, dest]);
+    setRoutePath(prev => [...prev, dest]);
   };
 
   const openInGoogleMaps = (station) => {
@@ -53,6 +53,16 @@ export default function MapView({
     const dest = `${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}`;
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`, "_blank");
   };
+
+  useEffect(() => {
+    // Polling mechanism for real-time updates every 5 minutes
+    const interval = setInterval(() => {
+      // Fetch stations status and updates here (pseudo-code)
+      // fetchStationsStatus().then(updatedStations => setStations(updatedStations));
+    }, 300000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <MapContainer center={center} zoom={13} style={{ height: "60vh", width: "100%" }}>
@@ -73,33 +83,50 @@ export default function MapView({
         const isOperational = station.StatusType?.IsOperational;
         const icon = isOperational ? greenIcon : redIcon;
 
-        const estimatedTime = estimateChargingTime(
-          batterySize,
-          batteryPercentage,
-          station.AddressInfo.Distance || 0
-        );
-
-        const powerKW = station.Connections?.[0]?.PowerKW || 22;
+        const connection = station.Connections?.[0];
+        const powerKW = connection?.PowerKW || getEstimatedPowerFromLevel(connection?.Level?.Title);
+        const connectionType = connection?.ConnectionType?.Title || "Unknown";
+        const level = connection?.Level?.Title || "Unknown";
+        const operator = station.OperatorInfo?.Title || "Unknown Operator";
+        const usageType = station.UsageType?.Title || "Unknown";
+        const distance = station.AddressInfo?.Distance;
+        
+        // Calculate cost and time with estimated or actual power
         const estimatedCost = estimateChargingCost(batterySize, batteryPercentage, powerKW);
+        const chargingTime = estimateChargingTime(batterySize, batteryPercentage, powerKW);
 
         return (
           <Marker key={index} position={pos} icon={icon}>
             <Popup>
-              <strong>{station.AddressInfo.Title}</strong><br />
-              {station.AddressInfo.AddressLine1}<br />
-              ⚡ Power: {powerKW} kW<br />
-              🔌 Connectors: {station.Connections?.length || 0}<br />
-              💡 Status: {isOperational ? "🟢 Available" : "🔴 Unavailable"}<br />
-              ⏱ Time to full charge: {estimatedTime} mins<br />
-              💰 Estimated cost: ₹{estimatedCost}<br />
-              <button className="btn btn-sm btn-primary mt-1" onClick={() => handleRoute(station)}>📍 Show Route</button>
-              <button className="btn btn-sm btn-success mt-1 ms-2" onClick={() => openInGoogleMaps(station)}>🧭 Open in Google Maps</button>
+              <div style={{ minWidth: '250px' }}>
+                <strong>{station.AddressInfo.Title}</strong><br />
+                📍 {station.AddressInfo.AddressLine1}<br />
+                {station.AddressInfo.Town && <span>🏙️ {station.AddressInfo.Town}<br /></span>}
+                📏 Distance: {distance ? `${distance.toFixed(1)} km` : 'N/A'}<br />
+                <hr style={{ margin: '8px 0' }} />
+                ⚡ Power: {powerKW === "N/A" ? powerKW : `${powerKW} kW`}<br />
+                🔌 Type: {connectionType}<br />
+                📊 Level: {level}<br />
+                🏢 Operator: {operator}<br />
+                🚪 Access: {usageType}<br />
+                💡 Status: {isOperational ? "🟢 Available" : "🔴 Unavailable"}<br />
+                {typeof powerKW === 'number' && (
+                  <>
+                    ⏱ Time to charge: {chargingTime} mins<br />
+                    💰 Est. cost: ₹{estimatedCost}<br />
+                  </>
+                )}
+                <div className="mt-2">
+                  <button className="btn btn-sm btn-primary me-1" onClick={() => handleAddStop(station)}>➕ Add Stop</button>
+                  <button className="btn btn-sm btn-success" onClick={() => openInGoogleMaps(station)}>🧭 Navigate</button>
+                </div>
+              </div>
             </Popup>
           </Marker>
         );
       })}
 
-      {routePath && <Polyline positions={routePath} color="blue" />}
+      {routePath.length > 1 && <Polyline positions={[center, ...routePath]} color="blue" />}
     </MapContainer>
   );
 }
