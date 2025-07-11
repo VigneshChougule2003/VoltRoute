@@ -8,6 +8,7 @@ import BatteryInput from "../components/BatteryInput";
 import SmartSuggestion from "../components/SmartSuggestion";
 import MapView from "../components/MapView";
 import Filters from "../components/Filters";
+import ActiveBooking from "../components/ActiveBooking";
 import { fetchStations } from "../utils/openChargeMapAPI";
 import { useCurrentLocation } from "../utils/locationUtils";
 import "./Dashboard.css";
@@ -74,8 +75,17 @@ export default function Dashboard() {
               onRefresh={fetchStationData}
             />
           </div>
+          <div className="dashboard-card">
+            <ActiveBooking onBookingUpdate={fetchStationData} />
+          </div>
         </div>
 
+        <div className="text-center my-3">
+          <button className="btn btn-outline-primary" onClick={() => navigate("/history")}>
+            📅 View Booking History
+          </button>
+        </div>
+        
         <div className="dashboard-map">
           <MapView
             stations={stations}

@@ -2,6 +2,9 @@
 
 const BASE_URL = "http://localhost:5000/api/openchargemap"; // Your proxy server
 
+// Import booking utility to check station availability
+import { isStationUnavailableDueToBooking } from "./bookingUtils";
+
 /**
  * Compute a smart score based on charger power, status, distance & battery level.
  */
@@ -36,7 +39,7 @@ export async function fetchStations(lat, lng, filters = {}) {
   });
 
   // 🔌 Connector type
-  if (filters.connector && filters.connector !== "All") {
+  if (filters.connector && filters.connector !== "") {
     params.append("connectiontypeid", filters.connector);
   }
 
@@ -46,7 +49,6 @@ export async function fetchStations(lat, lng, filters = {}) {
   } else if (filters.available === "Unavailable") {
     params.append("statustypeid", 75); // Offline
   }
-
   const url = `${BASE_URL}?${params.toString()}`;
 
   try {
@@ -61,15 +63,27 @@ export async function fetchStations(lat, lng, filters = {}) {
 
     if (!Array.isArray(data)) throw new Error("Invalid station data received");
 
-    // 🔍 Add smart ranking score
+    // 🔍 Add smart ranking score and check booking status
     const battery = filters.batteryPercentage || 50;
 
-    return data
-      .map((station) => ({
-        ...station,
-        _score: scoreStation(station, lat, lng, battery),
-      }))
-      .sort((a, b) => b._score - a._score);
+    // Check booking status for each station
+    const stationsWithBookingStatus = await Promise.all(
+      data.map(async (station) => {
+        const isBooked = await isStationUnavailableDueToBooking(station);
+        return {
+          ...station,
+          _score: scoreStation(station, lat, lng, battery),
+          _isBookedUnavailable: isBooked,
+          // Override operational status if booked and has only one connection
+          StatusType: {
+            ...station.StatusType,
+            IsOperational: station.StatusType?.IsOperational && !isBooked
+          }
+        };
+      })
+    );
+
+    return stationsWithBookingStatus.sort((a, b) => b._score - a._score);
   } catch (error) {
     console.error("❌ Fetch stations error:", error.message);
     return [];
