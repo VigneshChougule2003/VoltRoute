@@ -8,8 +8,17 @@ import {
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+
+// Fix for default markers
+if (typeof window !== 'undefined') {
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+}
 import { 
   estimateChargingTime, 
   estimateChargingCost, 
@@ -51,8 +60,44 @@ export default function MapView({
 }) {
   const [routePath, setRoutePath] = useState(null);
   const [bookingStatus, setBookingStatus] = useState({});
+  const mapRef = useRef(null);
 
-  const center = userLocation ? [userLocation.lat, userLocation.lng] : [15.85, 74.5];
+  const center = userLocation ? [userLocation.lat, userLocation.lng] : [20.5937, 78.9629]; // India center as fallback
+
+  // Debug logging
+  useEffect(() => {
+    console.log('MapView render:', { userLocation, center, stations: stations.length });
+  }, [userLocation, center, stations]);
+
+  // Cleanup effect to prevent map conflicts
+  useEffect(() => {
+    // Force re-render when component mounts
+    const timeoutId = setTimeout(() => {
+      if (mapRef.current) {
+        console.log('Invalidating map size');
+        mapRef.current.invalidateSize();
+      }
+    }, 200); // Increased timeout
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (mapRef.current) {
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Force map to invalidate size when center changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (mapRef.current) {
+        console.log('Map center changed, invalidating size');
+        mapRef.current.invalidateSize();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [center]);
 
   const handleRoute = (station) => {
     const dest = [station.AddressInfo.Latitude, station.AddressInfo.Longitude];
@@ -120,8 +165,47 @@ export default function MapView({
     }
   };
 
+  // Add error boundary for map rendering
+  const [mapError, setMapError] = useState(null);
+
+  if (mapError) {
+    return (
+      <div style={{ height: "60vh", width: "100%" }} className="dashboard-map-container">
+        <div className="d-flex align-items-center justify-content-center h-100">
+          <div className="text-center">
+            <h5 className="text-danger">Map Error</h5>
+            <p>Unable to load map. Please refresh the page.</p>
+            <button className="btn btn-primary" onClick={() => window.location.reload()}>
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <MapContainer center={center} zoom={13} style={{ height: "60vh", width: "100%" }}>
+    <div style={{ 
+      height: "60vh", 
+      width: "100%", 
+      background: "#f8f9fa"
+    }} className="dashboard-map-container">
+      <MapContainer 
+        key={`dashboard-map-${Date.now()}`}
+        center={center} 
+        zoom={13} 
+        style={{ height: "100%", width: "100%" }}
+        ref={mapRef}
+        scrollWheelZoom={true}
+        whenReady={() => {
+          console.log('Dashboard map is ready!');
+          setTimeout(() => {
+            if (mapRef.current) {
+              mapRef.current.invalidateSize();
+            }
+          }, 200);
+        }}
+      >
       <FlyToLocation position={center} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -284,6 +368,7 @@ export default function MapView({
       })}
 
       {routePath && <Polyline positions={routePath} color="blue" />}
-    </MapContainer>
+      </MapContainer>
+    </div>
   );
 }

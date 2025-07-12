@@ -7,6 +7,7 @@ import CarSelector from "../components/CarSelector";
 import BatteryInput from "../components/BatteryInput";
 import SmartSuggestion from "../components/SmartSuggestion";
 import MapView from "../components/MapView";
+import MapViewDebug from "../components/MapViewDebug";
 import Filters from "../components/Filters";
 import ActiveBooking from "../components/ActiveBooking";
 import { fetchStations } from "../utils/openChargeMapAPI";
@@ -81,9 +82,14 @@ export default function Dashboard() {
         </div>
 
         <div className="text-center my-3">
-          <button className="btn btn-outline-primary" onClick={() => navigate("/history")}>
-            📅 View Booking History
-          </button>
+          <div className="d-flex gap-2 justify-content-center flex-wrap">
+            <button className="btn btn-outline-primary" onClick={() => navigate("/history")}>
+              📅 View Booking History
+            </button>
+            <button className="btn btn-outline-success" onClick={() => navigate("/trip-planner")}>
+              🗺️ Plan Trip
+            </button>
+          </div>
         </div>
         
         <div className="dashboard-map">

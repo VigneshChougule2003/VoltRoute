@@ -455,3 +455,60 @@
   color: #ff6b35 !important;
   font-weight: 600 !important;
 }
+
+/* Map Container Isolation */
+.dashboard-map-container {
+  position: relative;
+  z-index: 1;
+  background: #f0f0f0; /* Debug background */
+  border: 2px solid #007bff; /* Debug border */
+  border-radius: 0.5rem;
+}
+
+.dashboard-map-container .leaflet-container {
+  background: #fff;
+  outline: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure map container has proper dimensions */
+.dashboard-map {
+  width: 100%;
+  height: auto;
+  min-height: 60vh;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+  background: #f8f9fa; /* Fallback background */
+}
+
+.trip-planner-map-container {
+  position: relative;
+  z-index: 2;
+}
+
+.trip-planner-map-container .leaflet-container {
+  background: #fff;
+  outline: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Ensure map tiles load properly */
+.leaflet-container .leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Fix map controls */
+.leaflet-control-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Map loading indicator */
+.leaflet-container.leaflet-touch-zoom {
+  -ms-touch-action: pan-x pan-y;
+  touch-action: pan-x pan-y;
+}
