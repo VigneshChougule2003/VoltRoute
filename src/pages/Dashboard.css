@@ -81,41 +81,6 @@
   font-weight: 500;
 }
 /* Custom Select Box Styling */
-.dashboard-card select {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
-  appearance: none; /* Removes default arrow */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  position: relative;
-  transition: background 0.3s ease, color 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-}
-
-.dashboard-card select:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.dashboard-card select:focus {
-  outline: none;
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
-}
-
-/* Optional: Add custom arrow using background-image */
-.dashboard-card select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23FFFFFF' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1rem;
-}
-
 /* Label text color fix */
 .dashboard-card label {
   color: #ffffff;
@@ -124,7 +89,7 @@
 }
 .dashboard-card select {
   background: rgba(255, 255, 255, 0.15);
-  color: #ffffff; /* ✅ Make text white */
+  color: #ffffff;
   border: none;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
@@ -135,11 +100,142 @@
   transition: background 0.3s ease, color 0.3s ease;
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23FFFFFF' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
 }
 
 .dashboard-card select option {
-  color: #000000; /* ✅ Dropdown options visible on open (black on white) */
+  color: #000000;
   background: #ffffff;
+}
+
+/* Form input styling */
+.dashboard-card input[type="number"],
+.dashboard-card input[type="text"],
+.dashboard-card input[type="range"] {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card input[type="number"]:focus,
+.dashboard-card input[type="text"]:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+}
+
+.dashboard-card input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Range slider styling */
+.dashboard-card input[type="range"] {
+  background: transparent;
+  padding: 0.5rem 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.dashboard-card input[type="range"]::-webkit-slider-track {
+  background: rgba(255, 255, 255, 0.3);
+  height: 6px;
+  border-radius: 3px;
+}
+
+.dashboard-card input[type="range"]::-webkit-slider-thumb {
+  background: linear-gradient(45deg, #00c9ff, #92fe9d);
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 8px rgba(0, 201, 255, 0.4);
+}
+
+.dashboard-card input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.3);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+}
+
+.dashboard-card input[type="range"]::-moz-range-thumb {
+  background: linear-gradient(45deg, #00c9ff, #92fe9d);
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 201, 255, 0.4);
+}
+
+/* Select hover and focus effects */
+.dashboard-card select:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.dashboard-card select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 1rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-cards {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-card {
+    min-width: 100%;
+    padding: 1rem;
+  }
+  
+  .logout-btn {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .dashboard-map {
+    min-height: 50vh;
+    border-radius: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    font-size: 1.75rem;
+  }
+  
+  .dashboard-card {
+    padding: 0.75rem;
+  }
+  
+  .dashboard-page .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
 }
 
 /* Dashboard Button Styling */
@@ -242,16 +338,62 @@
   box-shadow: 0 6px 20px rgba(108, 117, 125, 0.5);
 }
 
-/* Small button adjustments */
+/* Button Base Styles */
+.dashboard-page .btn {
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.dashboard-page .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+  z-index: -1;
+}
+
+.dashboard-page .btn:hover::before {
+  left: 100%;
+}
+
+/* Button Sizes */
+.dashboard-page .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
 .dashboard-page .btn-sm {
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
+}
+
+.dashboard-page .btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
 }
 
 /* Card buttons */
 .dashboard-card .btn {
-  backdrop-filter: blur(10px);
-  border-radius: 0.375rem;
+  backdrop-filter: blur(15px);
+  border-radius: 0.5rem;
+  font-weight: 600;
 }
 
 /* Booking history button styling */
@@ -263,25 +405,220 @@
 
 /* ActiveBooking component button styling */
 .dashboard-card .d-flex .btn {
-  min-width: 40px;
-  height: 40px;
+  min-width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.5rem;
+  border-radius: 0.5rem;
 }
 
-.dashboard-card .btn-outline-primary {
+/* Outline Button Styles */
+.dashboard-page .btn-outline-primary {
   background: rgba(13, 202, 240, 0.1);
-  border-color: rgba(13, 202, 240, 0.5);
+  border: 2px solid rgba(13, 202, 240, 0.6);
   color: #0dcaf0;
+  backdrop-filter: blur(10px);
 }
 
-.dashboard-card .btn-outline-primary:hover {
-  background: rgba(13, 202, 240, 0.2);
+.dashboard-page .btn-outline-primary:hover {
+  background: rgba(13, 202, 240, 0.25);
   border-color: #0dcaf0;
-  color: #31d2f2;
-  box-shadow: 0 0 10px rgba(13, 202, 240, 0.3);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(13, 202, 240, 0.4);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-success {
+  background: rgba(25, 135, 84, 0.1);
+  border: 2px solid rgba(25, 135, 84, 0.6);
+  color: #198754;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-success:hover {
+  background: rgba(25, 135, 84, 0.25);
+  border-color: #198754;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(25, 135, 84, 0.4);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-info {
+  background: rgba(13, 202, 240, 0.1);
+  border: 2px solid rgba(13, 202, 240, 0.6);
+  color: #0dcaf0;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-info:hover {
+  background: rgba(13, 202, 240, 0.25);
+  border-color: #0dcaf0;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(13, 202, 240, 0.4);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border: 2px solid rgba(255, 193, 7, 0.6);
+  color: #ffc107;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-warning:hover {
+  background: rgba(255, 193, 7, 0.25);
+  border-color: #ffc107;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid rgba(220, 53, 69, 0.6);
+  color: #dc3545;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-danger:hover {
+  background: rgba(220, 53, 69, 0.25);
+  border-color: #dc3545;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-light {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.dashboard-page .btn-outline-dark {
+  background: rgba(33, 37, 41, 0.1);
+  border: 2px solid rgba(33, 37, 41, 0.6);
+  color: #212529;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .btn-outline-dark:hover {
+  background: rgba(33, 37, 41, 0.25);
+  border-color: #212529;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(33, 37, 41, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Button States */
+.dashboard-page .btn:disabled,
+.dashboard-page .btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.dashboard-page .btn:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dashboard-page .btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.25);
+}
+
+/* Icon Buttons */
+.dashboard-page .btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-page .btn-icon-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+}
+
+.dashboard-page .btn-icon-lg {
+  width: 56px;
+  height: 56px;
+  font-size: 1.25rem;
+}
+
+/* Floating Action Button */
+.dashboard-page .btn-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.dashboard-page .btn-fab:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Loading Button */
+.dashboard-page .btn-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.dashboard-page .btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+  from { transform: rotate(0turn); }
+  to { transform: rotate(1turn); }
+}
+
+/* Button Groups */
+.dashboard-page .btn-group {
+  display: flex;
+  gap: 0;
+}
+
+.dashboard-page .btn-group .btn:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -2px;
+}
+
+.dashboard-page .btn-group .btn:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 /* Cancel booking button styling */
@@ -297,6 +634,47 @@
   box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
   transform: translateY(-1px);
 }
+
+/* Special Button Effects */
+.dashboard-page .btn-glow {
+  position: relative;
+}
+
+.dashboard-page .btn-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(45deg, #00c9ff, #92fe9d, #00c9ff);
+  background-size: 200% 200%;
+  animation: btn-glow-rotate 3s linear infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  z-index: -1;
+}
+
+@keyframes btn-glow-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulse Animation */
+.dashboard-page .btn-pulse {
+  animation: btn-pulse 2s infinite;
+}
+
+@keyframes btn-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(13, 202, 240, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 202, 240, 0); }
+}
+
 
 /* BookingHistory page specific styling */
 .dashboard-page .position-absolute.btn {
