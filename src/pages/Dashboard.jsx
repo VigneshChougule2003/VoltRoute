@@ -89,6 +89,9 @@ export default function Dashboard() {
             <button className="btn btn-outline-success" onClick={() => navigate("/trip-planner")}>
               🗺️ Plan Trip
             </button>
+            <button className="btn btn-outline-info" onClick={() => navigate("/ev-calculator")}>
+              🌱 EV Calculator
+            </button>
           </div>
         </div>
         
