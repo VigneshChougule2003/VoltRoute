@@ -11,7 +11,7 @@ app.use(cors());
 app.get("/api/openchargemap", async (req, res) => {
   const { latitude, longitude, distance, maxresults } = req.query;
 
-  const apiUrl = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=IN&latitude=${latitude}&longitude=${longitude}&distance=${distance}&maxresults=${maxresults}&key=18ec7b67-9e4e-457f-8bab-11a22eebcc1a`;
+  const apiUrl = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=IN&latitude=${latitude}&longitude=${longitude}&distance=${distance}&maxresults=${maxresults}&key=API_KEY`;
 
   try {
     const response = await fetch(apiUrl);
